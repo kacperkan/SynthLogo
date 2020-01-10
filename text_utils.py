@@ -5,6 +5,7 @@ import os.path as osp
 import pickle as cp
 import random
 
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import pygame
@@ -412,7 +413,7 @@ class RenderFont(object):
     def visualize_bb(self, text_arr, bbs):
         ta = text_arr.copy()
         for r in bbs:
-            cv.rectangle(
+            cv2.rectangle(
                 ta,
                 (r[0], r[1]),
                 (r[0] + r[2], r[1] + r[3]),
@@ -460,12 +461,12 @@ class FontState(object):
         font_model_path = osp.join(data_dir, "models/font_px2pt.cp")
 
         # get character-frequencies in the English language:
-        with open(char_freq_path, "r") as f:
-            self.char_freq = cp.load(f)
+        with open(char_freq_path, "rb") as f:
+            self.char_freq = cp.load(f, encoding="latin-1")
 
         # get the model to convert from pixel to font pt size:
-        with open(font_model_path, "r") as f:
-            self.font_model = cp.load(f)
+        with open(font_model_path, "rb") as f:
+            self.font_model = cp.load(f, encoding="latin-1")
 
         # get the names of fonts to use:
         self.FONT_LIST = osp.join(data_dir, "fonts/fontlist.txt")

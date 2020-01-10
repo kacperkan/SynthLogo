@@ -13,11 +13,13 @@ Entry-point for generating synthetic text images, as described in:
 """
 
 import os
-
+import os.path as osp
 import tarfile
-import wget
 
-from common import *
+import h5py
+import wget
+from PIL import Image
+
 from synthgen import *
 
 ## Define some configuration variables:

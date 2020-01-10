@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def fit_plane(xyz, z_pos=None):
@@ -21,8 +22,15 @@ def fit_plane(xyz, z_pos=None):
     return abcd
 
 
-def fit_plane_ransac(pts, neighbors=None, z_pos=None, dist_inlier=0.05,
-                     min_inlier_frac=0.60, nsample=3, max_iter=100):
+def fit_plane_ransac(
+    pts,
+    neighbors=None,
+    z_pos=None,
+    dist_inlier=0.05,
+    min_inlier_frac=0.60,
+    nsample=3,
+    max_iter=100,
+):
     """
     Fits a 3D plane model using RANSAC. 
     pts : (nx3 array) of point coordinates   
@@ -48,7 +56,7 @@ def fit_plane_ransac(pts, neighbors=None, z_pos=None, dist_inlier=0.05,
         ninlier = np.array(ninlier)
         best_model_idx = np.argsort(-ninlier)
         n_refit, m_refit, inliers = [], [], []
-        for idx in best_model_idx[:min(10, len(best_model_idx))]:
+        for idx in best_model_idx[: min(10, len(best_model_idx))]:
             # re-estimate the model based on inliers:
             dists = np.abs(pts.dot(models[idx][:3]) + models[idx][3])
             inlier = dists < dist_inlier
@@ -63,18 +71,16 @@ def fit_plane_ransac(pts, neighbors=None, z_pos=None, dist_inlier=0.05,
         return m_refit[best_plane], inliers[best_plane]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from matplotlib import pylab
     from mpl_toolkits import mplot3d
 
     fig = pylab.figure()
     ax = mplot3d.Axes3D(fig)
 
-
     def plot_plane(a, b, c, d):
         xx, yy = np.mgrid[10:20, 10:20]
         return xx, yy, (-d - a * xx - b * yy) / c
-
 
     n = 100
     max_iterations = 100
@@ -87,8 +93,14 @@ if __name__ == '__main__':
     ax.scatter3D(xyzs.T[0], xyzs.T[1], xyzs.T[2])
 
     # RANSAC
-    m, b = run_ransac(xyzs, estimate, lambda x, y: is_inlier(x, y, 0.01), 3,
-                      goal_inliers, max_iterations)
+    m, b = run_ransac(
+        xyzs,
+        estimate,
+        lambda x, y: is_inlier(x, y, 0.01),
+        3,
+        goal_inliers,
+        max_iterations,
+    )
     a, b, c, d = m
     xx, yy, zz = plot_plane(a, b, c, d)
     ax.plot_surface(xx, yy, zz, color=(0, 1, 0, 0.5))

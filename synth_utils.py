@@ -1,9 +1,13 @@
 import numpy as np
+import cv2
+import skimage as sim
+import skimage.filters
+
 
 from ransac import fit_plane_ransac
 
 
-# import mayavi.mlab as mym
+import mayavi.mlab as mym
 
 
 class LUT_RGB(object):
@@ -11,7 +15,8 @@ class LUT_RGB(object):
     RGB LUT for Mayavi glyphs.
     """
 
-    def __create_8bit_rgb_lut__(self):
+    @staticmethod
+    def __create_8bit_rgb_lut__():
         xl = np.mgrid[0:256, 0:256, 0:256]
         lut = np.vstack(
             (
@@ -23,7 +28,7 @@ class LUT_RGB(object):
         ).T
         return lut.astype("int32")
 
-    __lut__ = __create_8bit_rgb_lut__()
+    __lut__ = __create_8bit_rgb_lut__.__func__()
 
     @staticmethod
     def rgb2scalar(rgb):
@@ -250,12 +255,12 @@ def get_texture_score(img, masks, labels):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img = cv2.equalizeHist(img)
     img = img.astype("float32") / 255.0
-    img = sim.filters.gaussian_filter(img, sigma=1)
+    img = sim.filters.gaussian(img, sigma=1)
     G = np.clip(np.abs(sim.filters.laplace(img)), 0, 1)
 
     tex_score = []
     for l in labels:
-        ts = np.sum(G[masks == l].flat) / np.sum((masks == l).flat)
+        ts = np.sum(G[masks == l].flat) / np.sum((masks == l).flatten())
         tex_score.append(ts)
     return np.array(tex_score)
 
